@@ -803,7 +803,10 @@ about_bot_msg = f"This bot is made by with <3 by <@{Naveen_User_ID}> and <@{Aast
 async def about_bot(interaction: discord.Interaction):
     await interaction.response.send_message(about_bot_msg, ephemeral=False)
 
-
+async def clear_guild_commands():
+    async with client:
+        await client.sync_commands(guild=guild_id, commands=[])  #Clear all guild commands
+        print("Successfully cleared guild commands")
 
 
 client.run(TOKEN)
