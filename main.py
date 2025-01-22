@@ -30,6 +30,7 @@ class Client (commands.Bot):
         reminder_check.start()
         daily_reminder.start()
         await heart_reaction_loop(self)
+        clear_guild_commands()
         
         print (f'Logged on as {self.user}!')
     
