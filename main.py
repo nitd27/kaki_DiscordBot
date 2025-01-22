@@ -18,22 +18,20 @@ Naveen_User_ID = "776486456918540308"
 Aastha_User_ID = "1290696205491507260"
 
 
-class Client(commands.Bot):
+class Client (commands.Bot):
     async def on_ready(self):
         try:
-            # Replace GUILD_ID with your server's ID
-            guild = discord.Object(id=GUILD_ID)
-            
-            # Clear commands for the specific guild
-            synced = await self.tree.sync(guild=guild, commands=[])
-            print(f"Cleared all commands for guild {guild.id}.")
+            guild = discord.Object(id=1326112748379312138)
+            synced = await self.tree.sync(guild=guild)
+            print(f"synced {len(synced)} commands to guild {guild.id}")
         except Exception as e:
-            print(f"Error clearing guild commands: {e}")
+            print(f"Error syncing commands : {e}")
         
-        print(f"Logged on as {self.user}!")
-
-
-
+        reminder_check.start()
+        daily_reminder.start()
+        await heart_reaction_loop(self)
+        
+        print (f'Logged on as {self.user}!')
     
 
 
