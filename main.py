@@ -18,21 +18,22 @@ Naveen_User_ID = "776486456918540308"
 Aastha_User_ID = "1290696205491507260"
 
 
-class Client (commands.Bot):
+class Client(commands.Bot):
     async def on_ready(self):
         try:
-            guild = discord.Object(id=1326112748379312138)
-            synced = await self.tree.sync(guild=guild)
-            print(f"synced {len(synced)} commands to guild {guild.id}")
+            # Sync commands globally
+            synced = await self.tree.sync()
+            print(f"Synced {len(synced)} global commands.")
         except Exception as e:
-            print(f"Error syncing commands : {e}")
+            print(f"Error syncing commands: {e}")
         
+        # Start your tasks and other setup
         reminder_check.start()
         daily_reminder.start()
         await heart_reaction_loop(self)
-        clear_guild_commands()
         
-        print (f'Logged on as {self.user}!')
+        print(f"Logged on as {self.user}!")
+
     
 
 
@@ -804,10 +805,7 @@ about_bot_msg = f"This bot is made by with <3 by <@{Naveen_User_ID}> and <@{Aast
 async def about_bot(interaction: discord.Interaction):
     await interaction.response.send_message(about_bot_msg, ephemeral=False)
 
-async def clear_guild_commands():
-    async with client:
-        await client.sync_commands(commands=[])  # Clears all global commands
-        print("Successfully cleared guild commands")
+
 
 
 client.run(TOKEN)
