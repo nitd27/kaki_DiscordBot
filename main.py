@@ -21,18 +21,14 @@ Aastha_User_ID = "1290696205491507260"
 class Client(commands.Bot):
     async def on_ready(self):
         try:
-            # Sync commands globally
-            synced = await self.tree.sync()
-            print(f"Synced {len(synced)} global commands.")
+            # Clear all global commands
+            synced = await self.tree.sync(commands=[])
+            print("Cleared all global commands.")
         except Exception as e:
-            print(f"Error syncing commands: {e}")
-        
-        # Start your tasks and other setup
-        reminder_check.start()
-        daily_reminder.start()
-        await heart_reaction_loop(self)
+            print(f"Error clearing global commands: {e}")
         
         print(f"Logged on as {self.user}!")
+
 
     
 
