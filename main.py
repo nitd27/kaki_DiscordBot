@@ -21,13 +21,17 @@ Aastha_User_ID = "1290696205491507260"
 class Client(commands.Bot):
     async def on_ready(self):
         try:
-            # Clear all global commands
-            synced = await self.tree.sync(commands=[])
-            print("Cleared all global commands.")
+            # Replace GUILD_ID with your server's ID
+            guild = discord.Object(id=GUILD_ID)
+            
+            # Clear commands for the specific guild
+            synced = await self.tree.sync(guild=guild, commands=[])
+            print(f"Cleared all commands for guild {guild.id}.")
         except Exception as e:
-            print(f"Error clearing global commands: {e}")
+            print(f"Error clearing guild commands: {e}")
         
         print(f"Logged on as {self.user}!")
+
 
 
     
