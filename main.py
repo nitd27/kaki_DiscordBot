@@ -806,7 +806,7 @@ async def about_bot(interaction: discord.Interaction):
 
 async def clear_guild_commands():
     async with client:
-        await client.sync_commands(guild=guild_id, commands=[])  #Clear all guild commands
+        await client.sync_commands(commands=[])  # Clears all global commands
         print("Successfully cleared guild commands")
 
 
