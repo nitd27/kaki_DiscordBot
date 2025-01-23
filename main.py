@@ -17,6 +17,9 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 Naveen_User_ID = "776486456918540308" 
 Aastha_User_ID = "1290696205491507260"
 
+# Get IST time
+def get_ist_now():
+    return datetime.now() + timedelta(hours=5, minutes=30) #force bot to use IST for time related functions.
 
 class Client (commands.Bot):
     async def on_ready(self):
@@ -393,11 +396,11 @@ async def set_reminder(
     try:
         # Calculate the reminder date and time
         if date.lower() == "today":
-            reminder_date = datetime.now()
+            reminder_date = get_ist_now()
         elif date.lower() == "tomorrow":
-            reminder_date = datetime.now() + timedelta(days=1)
+            reminder_date = get_ist_now() + timedelta(days=1)
         elif date.lower() == "day after tomorrow":
-            reminder_date = datetime.now() + timedelta(days=2)
+            reminder_date = get_ist_now() + timedelta(days=2)
         else:
             reminder_date = datetime.strptime(date, "%d/%m/%Y")
 
@@ -411,7 +414,7 @@ async def set_reminder(
             reminder_date.year, reminder_date.month, reminder_date.day, hour, minute
         )
 
-        if reminder_datetime <= datetime.now():
+        if reminder_datetime <= get_ist_now():
             await interaction.response.send_message("You can't set a reminder in the past.")
             return
 
@@ -452,7 +455,7 @@ async def view_calendar(interaction: discord.Interaction):
 # Background task to check reminders
 @tasks.loop(seconds=1)  # Check every second
 async def reminder_check():
-    now = datetime.now()
+    now = get_ist_now()
     reminders_to_remove = []
 #update- 24jan 2025 -> removed while true
     for key, rem in reminders.items():
@@ -585,7 +588,7 @@ async def journal(interaction: discord.Interaction):
             gif_url = None
 
         # Create an embed with author's profile picture and GIF as image
-        today_date = datetime.now().strftime("%d/%m/%Y")
+        today_date = get_ist_now().strftime("%d/%m/%Y")
         embed = discord.Embed(
             title=f"{interaction.user.name}'s journal entry of {today_date}",
             description=journal_entry,
@@ -688,7 +691,7 @@ async def auto_change_pfp():
     """
     Automatically change the bot's profile picture at 6 AM and 11 PM IST.
     """
-    now = datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)  # Convert UTC to IST
+    now = get_ist_now()
     current_time = now.strftime("%H:%M")
 
     if current_time == "06:00":  # 6 AM IST || 06:00
@@ -751,6 +754,26 @@ async def change_pfp(interaction: discord.Interaction):
     """
     view = PFPChangeView()
     await interaction.response.send_message("Select an option to change the profile picture:", view=view, ephemeral=True)
+
+
+#################################################end############################################
+
+#############################################Time###############################################
+@client.tree.command(name="time", description="Get the local server time and bot's IST time", guild=Guild_ID)
+async def server_and_bot_time(interaction: discord.Interaction):
+    # Server local time (assumes UTC or server's timezone)
+    server_time = datetime.now()
+    server_time_str = server_time.strftime("%d/%m/%Y %I:%M %p")  # Adjust format as needed
+
+    # Bot's IST time
+    ist_time = get_ist_now()
+    ist_time_str = ist_time.strftime("%d/%m/%Y %I:%M %p")  # Adjust format as needed
+
+    # Response
+    await interaction.response.send_message(
+        f"**Server Time:** {server_time_str}\n"
+        f"**Bot's IST Time:** {ist_time_str}"
+    )
 ###############################################End#############################################
 
 ########About_bot_msg######
@@ -759,7 +782,6 @@ about_bot_msg = f"This bot is made by with <3 by <@{Naveen_User_ID}> and <@{Aast
 @client.tree.command(name="about-bot", description="List of commands", guild=Guild_ID)
 async def about_bot(interaction: discord.Interaction):
     await interaction.response.send_message(about_bot_msg, ephemeral=False)
-
 
 
 
