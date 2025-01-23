@@ -29,8 +29,9 @@ class Client (commands.Bot):
         
         reminder_check.start()
         daily_reminder.start()
-        await heart_reaction_loop(self)
-        
+        #start auto-profile updater on restart
+        if not auto_change_pfp.is_running():
+            auto_change_pfp.start()
         print (f'Logged on as {self.user}!')
     
 
@@ -330,7 +331,7 @@ async def on_message(message):
         # Prepare the response message with "****" replacing the banned words
         modified_content = message.content
         for word in detected_words:
-            modified_content = modified_content.replace(word, "****")
+            modified_content = modified_content.replace(word, "******")
 
         # Send a message in the same channel
         await message.channel.send(f"{message.author.name} used a banned word! Please stay mindful. You said: \"{modified_content}\"")
@@ -447,52 +448,47 @@ async def view_calendar(interaction: discord.Interaction):
     await interaction.response.send_message(f"**Reminders:**\n{calendar_view}")
 
 # Background task to check reminders
-@tasks.loop(seconds=1)  # Frequent checks for dynamic sleep
+@tasks.loop(seconds=1)  # Check every second
 async def reminder_check():
-    while True:  # Continuous check
-        now = datetime.now()
-        reminders_to_remove = []
+    now = datetime.now()
+    reminders_to_remove = []
+#update- 24jan 2025 -> removed while true
+    for key, rem in reminders.items():
+        reminder_time = datetime.strptime(rem["datetime"], "%d/%m/%Y %H:%M")
+        if now >= reminder_time:  # Trigger reminder
+            user_id = rem["user_id"]
+            channel_id = rem.get("channel_id")
+            content = rem["content"]
 
-        for key, rem in reminders.items():
-            reminder_time = datetime.strptime(rem["datetime"], "%d/%m/%Y %H:%M")
-            if now >= reminder_time:  # Trigger reminder
-                user_id = rem["user_id"]
-                channel_id = rem.get("channel_id")
-                content = rem["content"]
-
-                try:
-                    # Send DM to the user
-                    user = await client.fetch_user(user_id)
-                    if user:
-                        await user.send(
-                            f"\ud83d\udd14 Reminder: **{content}** (set for {reminder_time.strftime('%d/%m/%Y at %I:%M %p')})"
-                        )
-                except discord.NotFound:
-                    print(f"User with ID {user_id} not found. Removing reminder.")
-                    reminders_to_remove.append(key)
-                    continue
-                except discord.HTTPException as e:
-                    print(f"Failed to fetch user {user_id} due to an API error: {e}")
-                    continue
-
-                # Send reminder in the server channel
-                if channel_id:
-                    channel = client.get_channel(channel_id)
-                    if channel:
-                        await channel.send(
-                            f"\ud83d\udd14 <@{user_id}> Reminder: **{content}** (set for {reminder_time.strftime('%d/%m/%Y at %I:%M %p')})"
-                        )
-
+            try:
+                # Send DM to the user
+                user = await client.fetch_user(user_id)
+                if user:
+                    await user.send(
+                        f"🔔 Reminder: **{content}** (set for {reminder_time.strftime('%d/%m/%Y at %I:%M %p')})"
+                    )
+            except discord.NotFound:
+                print(f"User with ID {user_id} not found. Removing reminder.")
                 reminders_to_remove.append(key)
+                continue
+            except discord.HTTPException as e:
+                print(f"Failed to fetch user {user_id} due to an API error: {e}")
+                continue
 
-        for key in reminders_to_remove:
-            del reminders[key]
-        save_reminders(reminders)
+            # Send reminder in the server channel
+            if channel_id:
+                channel = client.get_channel(channel_id)
+                if channel:
+                    await channel.send(
+                        f"🔔 <@{user_id}> Reminder: **{content}** (set for {reminder_time.strftime('%d/%m/%Y at %I:%M %p')})"
+                    )
 
-        # Calculate the next sleep duration
-        next_minute = (now + timedelta(minutes=1)).replace(second=0, microsecond=0)
-        sleep_duration = (next_minute - now).total_seconds()
-        await asyncio.sleep(sleep_duration)
+            reminders_to_remove.append(key)
+
+    # Remove processed reminders
+    for key in reminders_to_remove:
+        del reminders[key]
+    save_reminders(reminders)
 
 #####################################################End#########################################################
 
@@ -500,18 +496,8 @@ async def reminder_check():
 
 #loop
 
-# Helper to calculate seconds until 10:00 PM
-def seconds_until_10pm():
-    now = datetime.now()
-    target_time = datetime.combine(now.date(), time(22, 00))  # 22:00 = 10:00 PM
-    if now.time() > time(22, 00):
-        target_time += timedelta(days=1)
-    return (target_time - now).total_seconds()
-
-@tasks.loop(hours=24)
+@tasks.loop(time=time(22, 0))  # Run at 10:00 PM daily
 async def daily_reminder():
-    await asyncio.sleep(seconds_until_10pm())  # Wait until 10:00 PM
-
     # Reminder message
     reminder_message = "Hey, <@{naveen}> & <@{aastha}>, use /journal and log your journal entry now!".format(
         naveen=Naveen_User_ID, aastha=Aastha_User_ID
@@ -519,12 +505,11 @@ async def daily_reminder():
 
     # Send message to each user's DM
     for user_id in [Naveen_User_ID, Aastha_User_ID]:
-        user = await client.fetch_user(user_id)
         try:
-            dm_channel = await user.create_dm()
-            await dm_channel.send(reminder_message)
+            user = await client.fetch_user(user_id)
+            await user.send(reminder_message)
         except Exception as e:
-            print(f"Failed to send DM to {user}: {e}")
+            print(f"Failed to send DM to user with ID {user_id}: {e}")
 
 @daily_reminder.before_loop
 async def before_daily_reminder():
@@ -658,26 +643,7 @@ async def say(interaction: discord.Interaction, message: str):
 
 ###reaction on "i love you"
 async def heart_reaction_loop(client):
-    """Function to handle reacting to messages containing 'I love you'."""
-    @client.event
-    async def on_message(message):
-        # Avoid reacting to bot's own messages
-        if message.author.bot:
-            return
-        
-        # Check if the message contains "I love you"
-        if "i love you" in message.content.lower():
-            words = message.content.split()  # Split message into words including spaces
-            heart_emojis = ["❤️", "💖", "💘", "💕", "💞", "💓", "💝", "💗", "🩷", "💊", "🌹", "💌", "💎", "🌺", "💜"]  # Expanded emoji list
-            
-            # Shuffle the heart emojis to ensure random reactions
-            random.shuffle(heart_emojis)
-            
-            # React with as many hearts as there are words in the message
-            for i, word in enumerate(words):
-                if i < len(heart_emojis):  # React to each word with a corresponding emoji
-                    random_emoji = heart_emojis[i]
-                    await message.add_reaction(random_emoji)
+#removed reaction feature. //Causing 2nd time definition of even on_message, which made banned word feature useless.
 
 #####Change_pfp#############################
 pfp_urls = {
