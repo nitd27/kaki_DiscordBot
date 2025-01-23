@@ -632,10 +632,6 @@ async def journal(interaction: discord.Interaction):
 
 ########################################################End################################################
 
-
-
-
-
 ############################################custom########################################
 
 ###say
@@ -755,16 +751,11 @@ async def change_pfp(interaction: discord.Interaction):
     """
     view = PFPChangeView()
     await interaction.response.send_message("Select an option to change the profile picture:", view=view, ephemeral=True)
-
-
-
-
 ###############################################End#############################################
 
-########Help######
+########About_bot_msg######
 
 about_bot_msg = f"This bot is made by with <3 by <@{Naveen_User_ID}> and <@{Aastha_User_ID}>. Please contact them via <@{Naveen_User_ID}> or <@{Aastha_User_ID}> if you have any questions." 
-
 @client.tree.command(name="about-bot", description="List of commands", guild=Guild_ID)
 async def about_bot(interaction: discord.Interaction):
     await interaction.response.send_message(about_bot_msg, ephemeral=False)
