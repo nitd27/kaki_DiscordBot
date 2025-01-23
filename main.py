@@ -28,10 +28,12 @@ class Client (commands.Bot):
             print(f"Error syncing commands : {e}")
         
         reminder_check.start()
-        daily_reminder.start()
+        if not daily_reminder.is_running():
+            daily_reminder.start()
         #start auto-profile updater on restart
         if not auto_change_pfp.is_running():
             auto_change_pfp.start()
+        
         print (f'Logged on as {self.user}!')
     
 
