@@ -641,8 +641,6 @@ async def journal(interaction: discord.Interaction):
 async def say(interaction: discord.Interaction, message: str):
     await interaction.response.send_message(message)
 
-###reaction on "i love you"
-async def heart_reaction_loop(client):
 #removed reaction feature. //Causing 2nd time definition of even on_message, which made banned word feature useless.
 
 #####Change_pfp#############################
