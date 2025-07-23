@@ -13,7 +13,7 @@ import aiohttp
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
-#developers:
+#developers user ID of discord for future use:
 Naveen_User_ID = "776486456918540308" 
 Aastha_User_ID = "1290696205491507260"
 
