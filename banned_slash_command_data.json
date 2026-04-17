@@ -1,4 +1,4 @@
 {
-    "banned_words": ["breakup", "argument"],
-    "allowed_role_list": ["Moderator", "Admin"]
+    "banned_words": ["Abusive_word1", "Abusive_word2"],
+    "allowed_role_list": ["Example_Allowed_role1", "Example_Allowed_role2"]
 }
