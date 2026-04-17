@@ -14,8 +14,8 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 #developers user ID of discord for future use:
-Naveen_User_ID = "776486456918540308" 
-Aastha_User_ID = "1290696205491507260"
+Dev_1_user_ID = "776486456918540308" 
+Dev_2_user_ID = "1290696205491507260"
 
 # Get IST time
 def get_ist_now():
