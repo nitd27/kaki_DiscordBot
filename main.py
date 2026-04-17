@@ -14,7 +14,7 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 #developers user ID of discord for future use:
-Dev_1_user_ID = "776486456918540308" 
+Dev_1_user_ID = "776486456918540308"  #me
 Dev_2_user_ID = "1290696205491507260"
 
 # Get IST time
@@ -505,11 +505,11 @@ async def reminder_check():
 async def daily_reminder():
     # Reminder message
     reminder_message = "Hey, <@{naveen}> & <@{aastha}>, use /journal and log your journal entry now!".format(
-        naveen=Naveen_User_ID, aastha=Aastha_User_ID
+        naveen=Dev_1_user_ID, aastha=Dev_2_user_ID
     )
 
     # Send message to each user's DM
-    for user_id in [Naveen_User_ID, Aastha_User_ID]:
+    for user_id in [Dev_1_user_ID, Dev_2_user_ID]:
         try:
             user = await client.fetch_user(user_id)
             await user.send(reminder_message)
@@ -577,10 +577,10 @@ async def journal(interaction: discord.Interaction):
         accomplishment_today = accomplishment_today_msg.content
 
         # Determine embed color and GIF based on user ID
-        if str(interaction.user.id) == Naveen_User_ID:  # Naveen_User_ID
+        if str(interaction.user.id) == Dev_1_user_ID:  # Dev_1_user_ID
             embed_color = discord.Color.blue()
             gif_url = "https://i.ibb.co/XZS19GG/dudu-writing-naveen.gif"  # GIF for Naveen
-        elif str(interaction.user.id) == Aastha_User_ID:  # Aastha_User_ID
+        elif str(interaction.user.id) == Dev_2_user_ID:  # Dev_2_user_ID
             embed_color = discord.Color.from_rgb(255, 182, 193)  # Baby Pink
             gif_url = "https://i.ibb.co/TtG2vsr/bubu-aastha.gif"  # GIF for Aastha
         else:
@@ -663,9 +663,9 @@ async def change_pfp(interaction: Interaction, user: str):
     await interaction.response.defer(ephemeral=True)
 
     user = user.lower()
-    if user == "naveen" and str(interaction.user.id) == Naveen_User_ID:
+    if user == "naveen" and str(interaction.user.id) == Dev_1_user_ID:
         pfp_url = pfp_urls["naveen"]
-    elif user == "aastha" and str(interaction.user.id) == Aastha_User_ID:
+    elif user == "aastha" and str(interaction.user.id) == Dev_2_user_ID:
         pfp_url = pfp_urls["aastha"]
     else:
         await interaction.followup.send("Sorry, you do not have permission to change the bot's PFP!")
@@ -778,7 +778,7 @@ async def server_and_bot_time(interaction: discord.Interaction):
 
 ########About_bot_msg######
 
-about_bot_msg = f"This bot is made by with <3 by <@{Naveen_User_ID}> and <@{Aastha_User_ID}>. Please contact them via <@{Naveen_User_ID}> or <@{Aastha_User_ID}> if you have any questions." 
+about_bot_msg = f"This bot is made by with <3 by <@{Dev_1_user_ID}> and <@{Dev_2_user_ID}>. Please contact them via <@{Dev_1_user_ID}> or <@{Dev_2_user_ID}> if you have any questions." 
 @client.tree.command(name="about-bot", description="List of commands", guild=Guild_ID)
 async def about_bot(interaction: discord.Interaction):
     await interaction.response.send_message(about_bot_msg, ephemeral=False)
