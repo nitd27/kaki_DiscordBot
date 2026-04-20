@@ -655,7 +655,7 @@ pfp_urls = {
 
 # Command to manually change the bot's PFP
 @client.tree.command(name="change-pfp", description="Change the bot's profile picture.", guild=Guild_ID)
-async def change_pfp(interaction: Interaction, user: str):
+async def Manual_change_pfp(interaction: Interaction, user: str):
     """
     Slash command to change the bot's profile picture based on user ('naveen' or 'aastha').
     """
@@ -748,7 +748,7 @@ class PFPChangeSelect(discord.ui.Select):
                 await interaction.response.send_message("Automatic profile picture updates are not running.", ephemeral=True)
 
 @client.tree.command(name="pfp-updater", description="Change the bot's profile picture.", guild=Guild_ID)
-async def change_pfp(interaction: discord.Interaction):
+async def pfp_updater_command(interaction: discord.Interaction):
     """
     Slash command to change the bot's profile picture with a dropdown menu.
     """
