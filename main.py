@@ -501,7 +501,7 @@ async def reminder_check():
 
 #loop
 
-@tasks.loop(time=time(22, 0))  # Run at 10:00 PM daily
+@tasks.loop(time=time(16, 30))  # Run at 10:00 PM daily
 async def daily_reminder():
     # Reminder message
     reminder_message = "Hey, <@{naveen}> & <@{aastha}>, use /journal and log your journal entry now!".format(
